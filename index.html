@@ -56,7 +56,15 @@
           window.location.href ="";
         });
       }
+      
+    document.addEventListener(adobe.target.event.REQUEST_SUCCEEDED, function(event) {
+      console.log('Event', event);
+      analytics.track('Request Succeeded');
+    });
+    document.addEventListener(adobe.target.event.CONTENT_RENDERING_SUCCEEDED, function(event) {
+      console.log('Event', event);
+      analytics.track('Experiment Content Rendered');
+    });
     </script>
-
   </body>
 </html>
