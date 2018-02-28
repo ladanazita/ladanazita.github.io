@@ -58,14 +58,32 @@
         });
       }
       
-    document.addEventListener(adobe.target.event.REQUEST_SUCCEEDED, function(event) {
-      console.log('Event', event);
-      analytics.track('Request Succeeded');
-    });
-    document.addEventListener(adobe.target.event.CONTENT_RENDERING_SUCCEEDED, function(event) {
-      console.log('Event', event);
-      analytics.track('Experiment Content Rendered');
-    });
+    // Validating which event to use.
+      document.addEventListener(adobe.target.event.REQUEST_SUCCEEDED, function(event) {
+        console.log('Event', event);
+        analytics.track('Request Succeeded');
+      });
+      document.addEventListener(adobe.target.event.CONTENT_RENDERING_SUCCEEDED, function(event) {
+        console.log('Event', event);
+        analytics.track('Experiment Content Rendered');
+      });
+      
+      adobe.target.trackEvent({
+        "mbox": "target-global-mbox",
+        "params": {
+            "param1": "value1"
+        }
+      });
+      
+      
+      adobe.target.trackEvent({
+          "mbox": "orderConfirmPage",
+          "params":{ 
+              "orderId": 1234, 
+              "orderTotal": 5678, 
+              "productPurchasedId": 91011 
+          }
+      });
     </script>
   </body>
 </html>
