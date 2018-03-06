@@ -43,11 +43,11 @@ var snippetVersion = analyticsq && analyticsq.SNIPPET_VERSION ? parseFloat(analy
 //     ...
 //   }
 // }
-analytics._VERSIONS = {"cdn":null,"integrations":{}};
+analytics._VERSIONS = {"cdn":null,"integrations":{"CMaaS":"1.0.0"}};
 
 // Initialize analytics.js. CDN will render configuration objects into
-// `{}` and `{"track":{}}` using project settings.
-analytics.initialize({}, {
+// `{"CMaaS":{"digitalDataObject":{"product":[{"productInfo":{"productID":"WCM_765aad41-8e1f-4006-9829-3847062134b5","productName":"IBM Resiliency Assessment","pageName":"business-continuity-assessment"}}],"page":{"category":{"primaryCategory":"IBM GTS - Resiliency Services"},"pageInfo":{"effectiveDate":"2018-02-28","expiryDate":"2017-12-18","language":"en-US","publishDate":"2018-02-28","publisher":"IBM Corporation","productTitle":"IBM Resiliency Assessment","version":"v18","contactModuleConfiguration":{"contactInformationBundleKey":{"focusArea":"IBM GTS - Resiliency Services","languageCode":"en","regionCode":"US"},"contactModuleTranslationKey":{"languageCode":"en","regionCode":"US"}},"ibm":{"contentDelivery":"Storefront","contentProducer":"ECM/WCM/Cloudant","country":"US","industry":"ZZ","owner":"Corporate Webmaster/New York/IBM","subject":"ZZ999","siteID":"ECOM","type":"CT502"}}}}}}` and `{"track":{}}` using project settings.
+analytics.initialize({"CMaaS":{"digitalDataObject":{"product":[{"productInfo":{"productID":"WCM_765aad41-8e1f-4006-9829-3847062134b5","productName":"IBM Resiliency Assessment","pageName":"business-continuity-assessment"}}],"page":{"category":{"primaryCategory":"IBM GTS - Resiliency Services"},"pageInfo":{"effectiveDate":"2018-02-28","expiryDate":"2017-12-18","language":"en-US","publishDate":"2018-02-28","publisher":"IBM Corporation","productTitle":"IBM Resiliency Assessment","version":"v18","contactModuleConfiguration":{"contactInformationBundleKey":{"focusArea":"IBM GTS - Resiliency Services","languageCode":"en","regionCode":"US"},"contactModuleTranslationKey":{"languageCode":"en","regionCode":"US"}},"ibm":{"contentDelivery":"Storefront","contentProducer":"ECM/WCM/Cloudant","country":"US","industry":"ZZ","owner":"Corporate Webmaster/New York/IBM","subject":"ZZ999","siteID":"ECOM","type":"CT502"}}}}}}, {
   initialPageview: snippetVersion === 0,
   plan: {"track":{}}
 });
@@ -1428,53 +1428,20 @@ Analytics.prototype.identify = function(id, traits, options, fn) {
   if (is.object(id)) options = traits, traits = id, id = user.id();
   /* eslint-enable no-unused-expressions, no-sequences */
 
-  var plan = this.options.plan || {};
-  var traitPlans = plan.identify || {};
-  var filteredTraits = extend({}, traits);
-
-  for (var trait in filteredTraits) {
-    if (filteredTraits.hasOwnProperty(trait)) {
-      var traitPlan = traitPlans[trait];
-
-      if (traitPlan) {
-        this.log('identify plan %o - %o', trait, traitPlan);
-        if (traitPlan.enabled === false) {
-          delete filteredTraits[trait];
-        }
-      } else if (traitPlans.__default) {
-        this.log('identify default plan %o - %o', trait, traitPlans.__default);
-        if (!traitPlans.__default.enabled) {
-          delete filteredTraits[trait];
-        }
-      }
-    }
-  }
-
   // clone traits before we manipulate so we don't do anything uncouth, and take
   // from `user` so that we carryover anonymous traits
-  user.identify(id, filteredTraits);
+  user.identify(id, traits);
 
-  // Send allowed traits to all integrations except Segment
   var msg = this.normalize({
     options: options,
     traits: user.traits(),
     userId: user.id()
   });
-  extend(msg.integrations, { 'Segment.io': false });
-  this._invoke('identify', new Identify(msg), true);
 
-  // Send all traits to the Segment, including the blocked ones
-  // (so the blocked counts get incremented)
-  var segmentMsg = this.normalize({
-    options: options,
-    traits: traits,
-    userId: user.id()
-  });
-  extend(segmentMsg.integrations, { All: false, 'Segment.io': true });
-  this._invoke('identify', new Identify(segmentMsg), false);
+  this._invoke('identify', new Identify(msg));
 
   // emit
-  this.emit('identify', id, filteredTraits, options);
+  this.emit('identify', id, traits, options);
   this._callback(fn);
   return this;
 };
@@ -1508,51 +1475,19 @@ Analytics.prototype.group = function(id, traits, options, fn) {
   if (is.object(id)) options = traits, traits = id, id = group.id();
   /* eslint-enable no-unused-expressions, no-sequences */
 
-  var plan = this.options.plan || {};
-  var traitPlans = plan.group || {};
-  var filteredTraits = extend({}, traits);
-
-  for (var trait in filteredTraits) {
-    if (filteredTraits.hasOwnProperty(trait)) {
-      var traitPlan = traitPlans[trait];
-
-      if (traitPlan) {
-        this.log('group plan %o - %o', trait, traitPlan);
-        if (traitPlan.enabled === false) {
-          delete filteredTraits[trait];
-        }
-      } else if (traitPlans.__default) {
-        this.log('group default plan %o - %o', trait, traitPlans.__default);
-        if (!traitPlans.__default.enabled) {
-          delete filteredTraits[trait];
-        }
-      }
-    }
-  }
 
   // grab from group again to make sure we're taking from the source
-  group.identify(id, filteredTraits);
+  group.identify(id, traits);
 
-  // Send allowed traits to all integrations except Segment
   var msg = this.normalize({
     options: options,
     traits: group.traits(),
     groupId: group.id()
   });
-  extend(msg.integrations, { 'Segment.io': false });
-  this._invoke('group', new Group(msg), true);
 
-  // Send all traits to the Segment, including the blocked ones
-  // (so the blocked counts get incremented)
-  var segmentMsg = this.normalize({
-    options: options,
-    traits: traits,
-    groupId: group.id()
-  });
-  extend(segmentMsg.integrations, { All: false, 'Segment.io': true });
-  this._invoke('group', new Group(segmentMsg), false);
+  this._invoke('group', new Group(msg));
 
-  this.emit('group', id, filteredTraits, options);
+  this.emit('group', id, traits, options);
   this._callback(fn);
   return this;
 };
@@ -1576,7 +1511,7 @@ Analytics.prototype.track = function(event, properties, options, fn) {
 
   // figure out if the event is archived.
   var plan = this.options.plan || {};
-  var trackPlans = plan.track || {};
+  var events = plan.track || {};
 
   // normalize
   var msg = this.normalize({
@@ -1586,18 +1521,18 @@ Analytics.prototype.track = function(event, properties, options, fn) {
   });
 
   // plan.
-  var trackPlan = trackPlans[event];
-  if (trackPlan) {
-    this.log('track plan %o - %o', event, trackPlan);
-    if (trackPlan.enabled === false) {
+  plan = events[event];
+  if (plan) {
+    this.log('plan %o - %o', event, plan);
+    if (plan.enabled === false) {
       // Disabled events should always be sent to Segment.
       defaults(msg.integrations, { All: false, 'Segment.io': true });
     } else {
-      defaults(msg.integrations, trackPlan.integrations || {});
+      defaults(msg.integrations, plan.integrations || {});
     }
-  } else if (trackPlans.__default) {
-    this.log('track default plan %o - %o', event, trackPlans.__default);
-    if (!trackPlans.__default.enabled) {
+  } else {
+    var defaultPlan = events.__default || { enabled: true };
+    if (!defaultPlan.enabled) {
       // Disabled events should always be sent to Segment.
       defaults(msg.integrations, { All: false, 'Segment.io': true });
     }
@@ -1880,18 +1815,13 @@ Analytics.prototype._callback = function(fn) {
  *
  * @param {string} method
  * @param {Facade} facade
- * @param {boolean} skipEmit
  * @return {Analytics}
  * @api private
  */
 
-Analytics.prototype._invoke = function(method, facade, skipEmit) {
-  // Default skipEmit to falsey for backwards compatibility
+Analytics.prototype._invoke = function(method, facade) {
   var self = this;
-
-  // Workaround to allow the Segment.io integration to be disabled due to it's non-standard setup.
-  // Used in identify() and group() for schema
-  if (!skipEmit) this.emit('invoke', facade);
+  this.emit('invoke', facade);
 
   var failedInitializations = self.failedInitializations || [];
   each(function(integration, name) {
@@ -2970,9 +2900,9 @@ module.exports.User = User;
 },{"./cookie":18,"./entity":19,"bind-all":35,"component-cookie":37,"debug":47,"inherits":49,"uuid":76}],27:[function(require,module,exports){
 module.exports={
   "_from": "@segment/analytics.js-core@^3.2.7",
-  "_id": "@segment/analytics.js-core@3.3.0",
+  "_id": "@segment/analytics.js-core@3.4.0",
   "_inBundle": false,
-  "_integrity": "sha1-D2q+ndkaSA8QdSUZ/gzE31h3d78=",
+  "_integrity": "sha1-0n6/+YjNcpKQVesZt5PNpH6NGFk=",
   "_location": "/@segment/ajs-compiler/@segment/analytics.js-core",
   "_phantomChildren": {},
   "_requested": {
@@ -2989,8 +2919,8 @@ module.exports={
   "_requiredBy": [
     "/@segment/ajs-compiler"
   ],
-  "_resolved": "https://registry.npmjs.org/@segment/analytics.js-core/-/analytics.js-core-3.3.0.tgz",
-  "_shasum": "0f6abe9dd91a480f10752519fe0cc4df587777bf",
+  "_resolved": "https://registry.npmjs.org/@segment/analytics.js-core/-/analytics.js-core-3.4.0.tgz",
+  "_shasum": "d27ebff988cd72929055eb19b793cda47e8d1859",
   "_spec": "@segment/analytics.js-core@^3.2.7",
   "_where": "/Users/ladannasserian/.nvm/versions/node/v8.9.4/lib/node_modules/@segment/ajs-compiler",
   "author": {
@@ -3081,7 +3011,7 @@ module.exports={
   "scripts": {
     "test": "make test"
   },
-  "version": "3.3.0"
+  "version": "3.4.0"
 }
 
 },{}],28:[function(require,module,exports){
@@ -9615,7 +9545,7 @@ var integration = require('@segment/analytics.js-integration');
  * Expose `ibm-cmaas` integration.
  */
 
-var cmaas = module.exports = integration('ibm-cmaas')
+var cmaas = module.exports = integration('CMaaS')
   .tag('<script src="https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js">')
   .tag('digitalDataObject','<script src= var digitalData = {{digitalDataObject}}');
 
