@@ -46,8 +46,8 @@ var snippetVersion = analyticsq && analyticsq.SNIPPET_VERSION ? parseFloat(analy
 analytics._VERSIONS = {"cdn":null,"integrations":{"CMaaS":"1.0.0"}};
 
 // Initialize analytics.js. CDN will render configuration objects into
-// `{"CMaaS":{"digitalDataObject":{"product":[{"productInfo":{"productID":"WCM_765aad41-8e1f-4006-9829-3847062134b5","productName":"IBM Resiliency Assessment","pageName":"business-continuity-assessment"}}],"page":{"category":{"primaryCategory":"IBM GTS - Resiliency Services"},"pageInfo":{"effectiveDate":"2018-02-28","expiryDate":"2017-12-18","language":"en-US","publishDate":"2018-02-28","publisher":"IBM Corporation","productTitle":"IBM Resiliency Assessment","version":"v18","contactModuleConfiguration":{"contactInformationBundleKey":{"focusArea":"IBM GTS - Resiliency Services","languageCode":"en","regionCode":"US"},"contactModuleTranslationKey":{"languageCode":"en","regionCode":"US"}},"ibm":{"contentDelivery":"Storefront","contentProducer":"ECM/WCM/Cloudant","country":"US","industry":"ZZ","owner":"Corporate Webmaster/New York/IBM","subject":"ZZ999","siteID":"ECOM","type":"CT502"}}}}}}` and `{"track":{}}` using project settings.
-analytics.initialize({"CMaaS":{"digitalDataObject":{"product":[{"productInfo":{"productID":"WCM_765aad41-8e1f-4006-9829-3847062134b5","productName":"IBM Resiliency Assessment","pageName":"business-continuity-assessment"}}],"page":{"category":{"primaryCategory":"IBM GTS - Resiliency Services"},"pageInfo":{"effectiveDate":"2018-02-28","expiryDate":"2017-12-18","language":"en-US","publishDate":"2018-02-28","publisher":"IBM Corporation","productTitle":"IBM Resiliency Assessment","version":"v18","contactModuleConfiguration":{"contactInformationBundleKey":{"focusArea":"IBM GTS - Resiliency Services","languageCode":"en","regionCode":"US"},"contactModuleTranslationKey":{"languageCode":"en","regionCode":"US"}},"ibm":{"contentDelivery":"Storefront","contentProducer":"ECM/WCM/Cloudant","country":"US","industry":"ZZ","owner":"Corporate Webmaster/New York/IBM","subject":"ZZ999","siteID":"ECOM","type":"CT502"}}}}}}, {
+// `{"CMaaS":{"tag":[{"value":{"tagToAdd":"<script='https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js'>"}},{"value":{"tagToAdd":"<script='{product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}'>"}}]}}` and `{"track":{}}` using project settings.
+analytics.initialize({"CMaaS":{"tag":[{"value":{"tagToAdd":"<script='https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js'>"}},{"value":{"tagToAdd":"<script='{product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}'>"}}]}}, {
   initialPageview: snippetVersion === 0,
   plan: {"track":{}}
 });
@@ -3417,7 +3417,7 @@ module.exports = (function() {
 		store.disabled = true
 	}
 	store.enabled = !store.disabled
-	
+
 	return store
 }())
 
@@ -4124,7 +4124,7 @@ var pattern = /(\w+)\[(\d+)\]/
 
 /**
  * Safely encode the given string
- * 
+ *
  * @param {String} str
  * @return {String}
  * @api private
@@ -4140,7 +4140,7 @@ var encode = function(str) {
 
 /**
  * Safely decode the string
- * 
+ *
  * @param {String} str
  * @return {String}
  * @api private
@@ -9546,8 +9546,7 @@ var integration = require('@segment/analytics.js-integration');
  */
 
 var cmaas = module.exports = integration('CMaaS')
-  .tag('<script src="https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js">')
-  .tag('digitalDataObject','<script src= var digitalData = {{digitalDataObject}}');
+  .tag('<script src="https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js">');
 
 /**
  * Initialize.
@@ -9559,19 +9558,20 @@ cmaas.prototype.initialize = function() {
   this.load(this.ready);
 };
 
-/**
- * Page
- *
- * @api public
- */
-
-// this.load happens async, if .page() needs to do more
-// keep this in mind or put it in load’s callback
-cmaas.prototype.page = function(page) {
-  var digitalDataObject = settings.digitalDataMap;
-  // this.load calls the script configured in integration.tag
-  this.load('digitalDataObject', digitalDataObject);
-};
+// /**
+//  * Page
+//  *
+//  * @api public
+//  */
+//
+// // this.load happens async, if .page() needs to do more
+// // keep this in mind or put it in load’s callback
+// cmaas.prototype.page = function(page) {
+//   for (tag in settings.tag) {
+//     // this.load calls the script configured in integration.tag
+//     this.load('tagToAdd', tag);
+//   }
+// };
 
 },{"@segment/analytics.js-integration":89}],78:[function(require,module,exports){
 arguments[4][4][0].apply(exports,arguments)
