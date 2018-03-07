@@ -9541,30 +9541,34 @@ module.exports = uuid;
 
 var integration = require('@segment/analytics.js-integration');
 
- window.onload = function() {
-   const tags = this.options.tags
+var self = this
+console.log(this.options)
+a = integration
 
-   tags.forEach(function (tag, i) {
-     const tagToAdd = tag.value.tagToAdd
-     console.log(tagToAdd)
-     /**
-      * Expose `ibm-cmaas` integration.
-      */
-     var cmaas = module.exports = integration('CMaaS')
-     .tag(tagToAdd);
-   })
+window.onload = function() {
+ const tags = self.options.tags
 
+ tags.forEach(function (tag, i) {
+   const tagToAdd = tag.value.tagToAdd
+   console.log(tagToAdd)
    /**
-    * Initialize.
-    *
-    * @api public
+    * Expose `ibm-cmaas` integration.
     */
+   var cmaas = module.exports = integration('CMaaS')
+   .tag(tagToAdd);
+ })
 
-   cmaas.prototype.initialize = function() {
-     this.load(this.ready);
-   };
+ /**
+  * Initialize.
+  *
+  * @api public
+  */
 
- }
+ cmaas.prototype.initialize = function() {
+   self.load(self.ready);
+ };
+
+}
 
 },{"@segment/analytics.js-integration":89}],78:[function(require,module,exports){
 arguments[4][4][0].apply(exports,arguments)
