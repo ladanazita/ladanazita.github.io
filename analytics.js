@@ -9541,34 +9541,23 @@ module.exports = uuid;
 
 var integration = require('@segment/analytics.js-integration');
 
-var self = this
-console.log("this=", this)
-console.log(this.options)
 
-window.onload = function() {
- const tags = self.options.tags
+/**
+ * Expose `ibm-cmaas` integration.
+ */
+var cmaas = module.exports = integration('CMaaS')
+.tag('<script src="https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js">')
+.tag('<script=var digitalData={product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}>')
 
- tags.forEach(function (tag, i) {
-   const tagToAdd = tag.value.tagToAdd
-   console.log(tagToAdd)
-   /**
-    * Expose `ibm-cmaas` integration.
-    */
-   var cmaas = module.exports = integration('CMaaS')
-   .tag(tagToAdd);
- })
+/**
+* Initialize.
+*
+* @api public
+*/
 
- /**
-  * Initialize.
-  *
-  * @api public
-  */
-
- cmaas.prototype.initialize = function() {
-   self.load(self.ready);
- };
-
-}
+cmaas.prototype.initialize = function() {
+ self.load(self.ready);
+};
 
 },{"@segment/analytics.js-integration":89}],78:[function(require,module,exports){
 arguments[4][4][0].apply(exports,arguments)
