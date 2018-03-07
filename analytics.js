@@ -9544,14 +9544,18 @@ var integration = require('@segment/analytics.js-integration');
 /**
  * Expose `ibm-cmaas` integration.
  */
-const tags = this.options.tags
 
-tags.forEach(function (tag, i) {
-  const tagToAdd = tag.value.tagToAdd
-  console.log(tagToAdd)
-  var cmaas = module.exports = integration('CMaaS')
-  .tag(tagToAdd);
-})
+ window.onload = function() {
+   const tags = this.options.tags
+
+   tags.forEach(function (tag, i) {
+     const tagToAdd = tag.value.tagToAdd
+     console.log(tagToAdd)
+     var cmaas = module.exports = integration('CMaaS')
+     .tag(tagToAdd);
+   })
+ }
+
 
 /**
  * Initialize.
