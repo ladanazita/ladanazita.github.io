@@ -9544,7 +9544,7 @@ var integration = require('@segment/analytics.js-integration');
 /**
  * Expose `ibm-cmaas` integration.
  */
-const tags = this.settings.tags
+const tags = this.options.tags
 
 tags.forEach(function (tag, i) {
   const tagToAdd = tag.value.tagToAdd
