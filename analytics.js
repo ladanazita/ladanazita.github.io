@@ -9542,8 +9542,8 @@ module.exports = uuid;
 var integration = require('@segment/analytics.js-integration');
 
 var self = this
+console.log("this=", this)
 console.log(this.options)
-a = integration
 
 window.onload = function() {
  const tags = self.options.tags
