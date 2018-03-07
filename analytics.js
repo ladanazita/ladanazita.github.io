@@ -9541,31 +9541,30 @@ module.exports = uuid;
 
 var integration = require('@segment/analytics.js-integration');
 
-/**
- * Expose `ibm-cmaas` integration.
- */
-
  window.onload = function() {
    const tags = this.options.tags
 
    tags.forEach(function (tag, i) {
      const tagToAdd = tag.value.tagToAdd
      console.log(tagToAdd)
+     /**
+      * Expose `ibm-cmaas` integration.
+      */
      var cmaas = module.exports = integration('CMaaS')
      .tag(tagToAdd);
    })
+
+   /**
+    * Initialize.
+    *
+    * @api public
+    */
+
+   cmaas.prototype.initialize = function() {
+     this.load(this.ready);
+   };
+
  }
-
-
-/**
- * Initialize.
- *
- * @api public
- */
-
-cmaas.prototype.initialize = function() {
-  this.load(this.ready);
-};
 
 },{"@segment/analytics.js-integration":89}],78:[function(require,module,exports){
 arguments[4][4][0].apply(exports,arguments)
