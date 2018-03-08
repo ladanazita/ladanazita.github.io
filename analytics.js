@@ -9556,6 +9556,7 @@ var cmaas = module.exports = integration('CMaaS');
 cmaas.prototype.initialize = function() {
   this.appendObject();
   this.appendScript();
+  console.log("options=", this.options);
   this.load(this.ready);
 };
 
