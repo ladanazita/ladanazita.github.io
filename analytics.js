@@ -9545,8 +9545,7 @@ var integration = require('@segment/analytics.js-integration');
 /**
  * Expose `ibm-cmaas` integration.
  */
-var cmaas = module.exports = integration('CMaaS')
-.tag('<script src="https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js">');
+var cmaas = module.exports = integration('CMaaS');
 
 /**
 * Initialize.
@@ -9556,6 +9555,7 @@ var cmaas = module.exports = integration('CMaaS')
 
 cmaas.prototype.initialize = function() {
   this.appendObject();
+  this.appendScript();
   this.load(this.ready);
 };
 
@@ -9567,6 +9567,15 @@ cmaas.prototype.appendObject = function() {
   var scriptBody = document.createTextNode(body)
   console.log('scriptBody=', scriptBody)
   node.appendChild(scriptBody)
+  var head = document.getElementsByTagName('head')[0]
+  console.log('head=', head)
+  head.appendChild(node)
+}
+
+cmaas.prototype.appendScript = function() {
+  var node = document.createElement('script')
+  console.log('node=', node)
+  node.setAttribute('src', 'https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js')
   var head = document.getElementsByTagName('head')[0]
   console.log('head=', head)
   head.appendChild(node)
