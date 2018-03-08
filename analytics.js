@@ -9560,7 +9560,7 @@ cmaas.prototype.initialize = function() {
 };
 
 
-cmass.prototype.appendObject = function() {
+cmaas.prototype.appendObject = function() {
   var node = document.createElement('script')
   console.log('node=', node)
   var body = 'var digitalData={product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}'
