@@ -9546,8 +9546,7 @@ var integration = require('@segment/analytics.js-integration');
  * Expose `ibm-cmaas` integration.
  */
 var cmaas = module.exports = integration('CMaaS')
-.tag('<script src="https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js">')
-.tag('<script> var digitalData={product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}} </script>')
+.tag('<script src="https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js">');
 
 /**
 * Initialize.
@@ -9556,9 +9555,22 @@ var cmaas = module.exports = integration('CMaaS')
 */
 
 cmaas.prototype.initialize = function() {
-  // debugger
- this.load(this.ready);
+  this.appendObject();
+  this.load(this.ready);
 };
+
+
+cmass.prototype.appendObject = function() {
+  var node = document.createElement('script')
+  console.log('node=', node)
+  var body = 'var digitalData={product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}'
+  var scriptBody = document.createTextNode(body)
+  console.log('scriptBody=', scriptBody)
+  node.appendChild(scriptBody)
+  var head = document.getElementsByTagName('head')[0]
+  console.log('head=', head)
+  head.appendChild(node)
+}
 
 },{"@segment/analytics.js-integration":89}],78:[function(require,module,exports){
 arguments[4][4][0].apply(exports,arguments)
