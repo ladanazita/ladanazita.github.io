@@ -3,19 +3,6 @@
   <head>
     <title> Home Questionaire </title>
     
-   <!-- Adobe Target settings, allows cookies on all subdomains -->
-   <script>
-      window.targetGlobalSettings = {
-      cookieDomain: "ladanazita.github.io"
-    }
-   </script>
-<!--     <script>
-      var digitalData={product:[{productInfo:{productID:"WCM_765aad41-8e1f-4006-9829-3847062134b5",productName:"IBM Resiliency Assessment",pageName:"business-continuity-assessment"}}],page:{category:{primaryCategory:"IBM GTS - Resiliency Services"},pageInfo:{effectiveDate:"2018-03-05",expiryDate:"2017-12-18",language:"en-US",publishDate:"2018-03-05",publisher:"IBM Corporation",productTitle:"IBM Resiliency Assessment",version:"v18",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:"IBM GTS - Resiliency Services",languageCode:"en",regionCode:"US"},contactModuleTranslationKey:{languageCode:"en",regionCode:"US"}},ibm:{contentDelivery:"Storefront",contentProducer:"ECM/WCM/Cloudant",country:"US",industry:"ZZ",owner:"Corporate Webmaster/New York/IBM",subject:"ZZ999",siteID:"ECOM",type:"CT502"}}}}
-    </script> -->
-    
-   <!-- Adobe Target at.js, must be included in the head! -->
-   <script src="at.js"></script>
-    
     <!-- ajs -->
     <script>
       !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t,e){var n=document.createElement("script");n.type="text/javascript";n.async=!0;n.src="analytics.js";var o=document.getElementsByTagName("script")[0];o.parentNode.insertBefore(n,o);analytics.integrationOptions=e};analytics.SNIPPET_VERSION="4.0.1";
@@ -64,34 +51,6 @@
           window.location.href ="";
         });
       }
-      
-    // Validating which event to use.
-      document.addEventListener(adobe.target.event.REQUEST_SUCCEEDED, function(event) {
-        console.log('Event', event);
-        analytics.track('Request Succeeded');
-      });
-      document.addEventListener(adobe.target.event.CONTENT_RENDERING_SUCCEEDED, function(event) {
-        console.log('Event', event);
-        analytics.track('Experiment Content Rendered');
-      });
-      
-      // Generic Custom Event. `mbox` is a required field.
-      adobe.target.trackEvent({
-        "mbox": "target-global-mbox",
-        "params": {
-            "param1": "value1"
-        }
-      });
-      
-      // Order Completed Event. Tracks revenue in Adobe Target.
-      adobe.target.trackEvent({
-          "mbox": "orderConfirmPage",
-          "params":{ 
-              "orderId": 1234, 
-              "orderTotal": 5678, 
-              "productPurchasedId": 91011 
-          }
-      });
     </script>
   </body>
 </html>
