@@ -43,11 +43,11 @@ var snippetVersion = analyticsq && analyticsq.SNIPPET_VERSION ? parseFloat(analy
 //     ...
 //   }
 // }
-analytics._VERSIONS = {"cdn":null,"integrations":{"CMaaS":"1.0.0"}};
+analytics._VERSIONS = {"cdn":null,"integrations":{}};
 
 // Initialize analytics.js. CDN will render configuration objects into
-// `{"CMaaS":{"tags":[{"value":{"tagToAdd":"https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js"}},{"value":{"tagToAdd":"var digitalData={product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}"}}]}}` and `{"track":{}}` using project settings.
-analytics.initialize({"CMaaS":{"tags":[{"value":{"tagToAdd":"https://www.ibm.com/common/digitaladvisor/js/cm-app.min.js"}},{"value":{"tagToAdd":"var digitalData={product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}"}}]}}, {
+// `{}` and `{"track":{}}` using project settings.
+analytics.initialize({}, {
   initialPageview: snippetVersion === 0,
   plan: {"track":{}}
 });
@@ -78,10 +78,10 @@ global.analytics = analytics;
 }).call(this,typeof window !== "undefined" && window.document && window.document.implementation ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {})
 },{"./analytics":1,"./integrations":3}],3:[function(require,module,exports){
 module.exports = {
-  'ibm-cmaas': require('@segment/analytics.js-integration-ibm-cmaas')
+  'chartbeat': require('@segment/analytics.js-integration-chartbeat')
 };
 
-},{"@segment/analytics.js-integration-ibm-cmaas":77}],4:[function(require,module,exports){
+},{"@segment/analytics.js-integration-chartbeat":77}],4:[function(require,module,exports){
 'use strict';
 
 /*
@@ -9539,51 +9539,122 @@ module.exports = uuid;
  * Module dependencies.
  */
 
+var defaults = require('@ndhoule/defaults');
 var integration = require('@segment/analytics.js-integration');
-
+var onBody = require('on-body');
 
 /**
- * Expose `ibm-cmaas` integration.
+ * Expose `Chartbeat` integration.
  */
-var cmaas = module.exports = integration('CMaaS');
+
+var Chartbeat = module.exports = integration('Chartbeat')
+  .global('_sf_async_config')
+  .global('_sf_endpt')
+  .global('pSUPERFLY')
+  .option('domain', '')
+  .option('uid', null)
+  .option('video', false)
+  .option('sendNameAndCategoryAsTitle', false)
+  .option('subscriberEngagementKeys', [])
+
+  .tag('<script src="//static.chartbeat.com/js/{{ script }}">');
 
 /**
-* Initialize.
-*
-* @api public
-*/
+ * Loaded?
+ *
+ * @api private
+ * @return {boolean}
+ */
 
-cmaas.prototype.initialize = function() {
-  const tags = this.options.tags
-  this.appendObject(tags[1].value.tagToAdd);
-  this.appendScript(tags[0].value.tagToAdd);
-  console.log('tags', tags)
-  this.load(this.ready);
+Chartbeat.prototype.loaded = function() {
+  return !!window.pSUPERFLY;
 };
 
+Chartbeat.prototype.initialize = function() {
+  this.pageCalledYet = false;
+  this._ready = true; // temporarily switch ready to true so that a single page call can fire
+};
 
-cmaas.prototype.appendObject = function(object) {
-  var node = document.createElement('script')
-  console.log('node=', node)
-  // var body = 'var digitalData={product:[{productInfo:{productID:\"WCM_765aad41-8e1f-4006-9829-3847062134b5\",productName:\"IBM Resiliency Assessment\",pageName:\"business-continuity-assessment\"}}],page:{category:{primaryCategory:\"IBM GTS - Resiliency Services\"},pageInfo:{effectiveDate:\"2018-03-05\",expiryDate:\"2017-12-18\",language:\"en-US\",publishDate:\"2018-03-05\",publisher:\"IBM Corporation\",productTitle:\"IBM Resiliency Assessment\",version:\"v18\",contactModuleConfiguration:{contactInformationBundleKey:{focusArea:\"IBM GTS - Resiliency Services\",languageCode:\"en\",regionCode:\"US\"},contactModuleTranslationKey:{languageCode:\"en\",regionCode:\"US\"}},ibm:{contentDelivery:\"Storefront\",contentProducer:\"ECM/WCM/Cloudant\",country:\"US\",industry:\"ZZ\",owner:\"Corporate Webmaster/New York/IBM\",subject:\"ZZ999\",siteID:\"ECOM\",type:\"CT502\"}}}}'
-  var scriptBody = document.createTextNode(object)
-  console.log('scriptBody=', scriptBody)
-  node.appendChild(scriptBody)
-  var head = document.getElementsByTagName('head')[0]
-  console.log('head=', head)
-  head.appendChild(node)
-}
+/**
+ * Page.
+ *
+ * http://chartbeat.com/docs/handling_virtual_page_changes/
+ *
+ * @api public
+ * @param {Page} page
+ */
 
-cmaas.prototype.appendScript = function(script) {
-  var node = document.createElement('script')
-  console.log('node=', node)
-  node.setAttribute('src', script)
-  var head = document.getElementsByTagName('head')[0]
-  console.log('head=', head)
-  head.appendChild(node)
-}
+Chartbeat.prototype.page = function(page) {
+  this.updateConfig(page);
 
-},{"@segment/analytics.js-integration":89}],78:[function(require,module,exports){
+  // since chartbeat automatically calls a page when it loads, don't load chartbeat script until
+  // first Segment page call comes in and configures global config vars using its props
+  if (!this.pageCalledYet) {
+    this._ready = false;  // switch ready to false so that no pages after the first one can fire until _initialize has loaded chartbeat script
+    this.pageCalledYet = true;
+    this._initialize();
+  } else {
+    var props = page.properties();
+    window.pSUPERFLY.virtualPage(props.path);
+  }
+};
+
+// update chartbeat global config vars
+Chartbeat.prototype.updateConfig = function(page) {
+  var category = page.category();
+  var author = page.proxy('properties.author');
+  var props = page.properties();
+
+  // Chartbeat expects the document.title (props.title) to populate as title
+  // This maintains legacy behavior for existing users,
+  // defaults new users to the correct behavior,
+  // and allows current users to opt-in to the correct behavior.
+  // http://support.chartbeat.com/docs/#titles
+  var title;
+  if (this.options.sendNameAndCategoryAsTitle) {
+    title = page.fullName() || props.title;
+  } else {
+    title = props.title;
+  }
+
+  // update general config
+  window._sf_async_config = window._sf_async_config || {};
+
+  if (category) window._sf_async_config.sections = category;
+  if (author) window._sf_async_config.authors = author;
+  if (title) window._sf_async_config.title = title;
+
+  // update subscriber engagement
+  var _cbq = window._cbq = window._cbq || [];
+
+  for (var key in props) {
+    if (!props.hasOwnProperty(key)) continue;
+    if (this.options.subscriberEngagementKeys.indexOf(key) > -1) {
+      _cbq.push([key, props[key]]);
+    }
+  }
+};
+
+// sets global vars and loads Chartbeat script
+Chartbeat.prototype._initialize = function() {
+  var self = this;
+  var script = this.options.video ? 'chartbeat_video.js' : 'chartbeat.js';
+
+  window._sf_async_config.useCanonical = true;
+  defaults(window._sf_async_config, {
+    domain: this.options.domain,
+    uid: this.options.uid
+  });
+
+  onBody(function() {
+    window._sf_endpt = new Date().getTime();
+    // Note: Chartbeat depends on document.body existing so the script does
+    // not load until that is confirmed. Otherwise it may trigger errors.
+    self.load({ script: script }, self.ready);  // switch ready to true for real once the script has loaded
+  });
+};
+
+},{"@ndhoule/defaults":80,"@segment/analytics.js-integration":89,"on-body":109}],78:[function(require,module,exports){
 arguments[4][4][0].apply(exports,arguments)
 },{"@ndhoule/arity":79,"dup":4}],79:[function(require,module,exports){
 arguments[4][5][0].apply(exports,arguments)
@@ -9719,7 +9790,7 @@ function createIntegration(name) {
 
 module.exports = createIntegration;
 
-},{"./protos":90,"./statics":91,"@ndhoule/defaults":80,"component-bind":95,"debug":98,"extend":101,"slug-component":107}],90:[function(require,module,exports){
+},{"./protos":90,"./statics":91,"@ndhoule/defaults":80,"component-bind":95,"debug":101,"extend":104,"slug-component":111}],90:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10189,7 +10260,7 @@ function render(template, locals) {
   }, {}, template.attrs);
 }
 
-},{"@ndhoule/after":78,"@ndhoule/each":82,"@ndhoule/every":83,"@ndhoule/foldl":84,"@segment/fmt":92,"@segment/load-script":93,"analytics-events":94,"component-emitter":96,"is":102,"load-iframe":103,"next-tick":105,"to-no-case":108}],91:[function(require,module,exports){
+},{"@ndhoule/after":78,"@ndhoule/each":82,"@ndhoule/every":83,"@ndhoule/foldl":84,"@segment/fmt":92,"@segment/load-script":93,"analytics-events":94,"component-emitter":98,"is":105,"load-iframe":106,"next-tick":108,"to-no-case":113}],91:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10354,7 +10425,7 @@ function objectify(str) {
   };
 }
 
-},{"@ndhoule/each":82,"@ndhoule/includes":85,"component-emitter":96,"domify":100}],92:[function(require,module,exports){
+},{"@ndhoule/each":82,"@ndhoule/includes":85,"component-emitter":98,"domify":103}],92:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -10461,7 +10532,7 @@ function loadScript(options, cb) {
 
 module.exports = loadScript;
 
-},{"component-type":97,"next-tick":105,"script-onload":106}],94:[function(require,module,exports){
+},{"component-type":100,"next-tick":108,"script-onload":110}],94:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10786,10 +10857,16 @@ module.exports = foldl(function transform(ret, pairs, method) {
 },{"@ndhoule/foldl":84,"@ndhoule/map":87}],95:[function(require,module,exports){
 arguments[4][36][0].apply(exports,arguments)
 },{"dup":36}],96:[function(require,module,exports){
+arguments[4][38][0].apply(exports,arguments)
+},{"component-type":97,"dup":38,"to-function":112,"type":97}],97:[function(require,module,exports){
+arguments[4][39][0].apply(exports,arguments)
+},{"dup":39}],98:[function(require,module,exports){
 arguments[4][40][0].apply(exports,arguments)
-},{"dup":40}],97:[function(require,module,exports){
+},{"dup":40}],99:[function(require,module,exports){
+arguments[4][42][0].apply(exports,arguments)
+},{"dup":42}],100:[function(require,module,exports){
 arguments[4][45][0].apply(exports,arguments)
-},{"dup":45}],98:[function(require,module,exports){
+},{"dup":45}],101:[function(require,module,exports){
 (function (process){
 /**
  * This is the web browser implementation of `debug()`.
@@ -10978,7 +11055,7 @@ function localstorage() {
 }
 
 }).call(this,require('_process'))
-},{"./debug":99,"_process":59}],99:[function(require,module,exports){
+},{"./debug":102,"_process":59}],102:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -11182,7 +11259,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":104}],100:[function(require,module,exports){
+},{"ms":107}],103:[function(require,module,exports){
 
 /**
  * Expose `parse`.
@@ -11296,11 +11373,11 @@ function parse(html, doc) {
   return fragment;
 }
 
-},{}],101:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 arguments[4][48][0].apply(exports,arguments)
-},{"dup":48}],102:[function(require,module,exports){
+},{"dup":48}],105:[function(require,module,exports){
 arguments[4][51][0].apply(exports,arguments)
-},{"dup":51}],103:[function(require,module,exports){
+},{"dup":51}],106:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -11362,7 +11439,7 @@ module.exports = function loadIframe(options, fn){
   return iframe;
 };
 
-},{"is":102,"next-tick":105,"script-onload":106}],104:[function(require,module,exports){
+},{"is":105,"next-tick":108,"script-onload":110}],107:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -11516,9 +11593,63 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],105:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 arguments[4][57][0].apply(exports,arguments)
-},{"_process":59,"dup":57}],106:[function(require,module,exports){
+},{"_process":59,"dup":57}],109:[function(require,module,exports){
+var each = require('each');
+
+
+/**
+ * Cache whether `<body>` exists.
+ */
+
+var body = false;
+
+
+/**
+ * Callbacks to call when the body exists.
+ */
+
+var callbacks = [];
+
+
+/**
+ * Export a way to add handlers to be invoked once the body exists.
+ *
+ * @param {Function} callback  A function to call when the body exists.
+ */
+
+module.exports = function onBody (callback) {
+  if (body) {
+    call(callback);
+  } else {
+    callbacks.push(callback);
+  }
+};
+
+
+/**
+ * Set an interval to check for `document.body`.
+ */
+
+var interval = setInterval(function () {
+  if (!document.body) return;
+  body = true;
+  each(callbacks, call);
+  clearInterval(interval);
+}, 5);
+
+
+/**
+ * Call a callback, passing it the body.
+ *
+ * @param {Function} callback  The callback to call.
+ */
+
+function call (callback) {
+  callback(document.body);
+}
+},{"each":96}],110:[function(require,module,exports){
 
 // https://github.com/thirdpartyjs/thirdpartyjs-code/blob/master/examples/templates/02/loading-files/index.html
 
@@ -11573,7 +11704,7 @@ function attach(el, fn){
   });
 }
 
-},{}],107:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 
 /**
  * Generate a slug from the given `str`.
@@ -11598,7 +11729,9 @@ module.exports = function (str, options) {
     .replace(/ +/g, options.separator || '-')
 };
 
-},{}],108:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
+arguments[4][72][0].apply(exports,arguments)
+},{"component-props":99,"dup":72,"props":99}],113:[function(require,module,exports){
 
 /**
  * Expose `toNoCase`.
